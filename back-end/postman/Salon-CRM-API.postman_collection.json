@@ -1,0 +1,1121 @@
+{
+  "info": {
+    "name": "Salon CRM API",
+    "description": "Complete API collection for Salon CRM GraphQL endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "salon-crm-api-collection"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set headers for all requests",
+          "pm.request.headers.add({",
+          "    key: 'x-api-key',",
+          "    value: pm.environment.get('apiKey')",
+          "});",
+          "",
+          "// Add auth token if available",
+          "const authToken = pm.environment.get('authToken');",
+          "if (authToken) {",
+          "    pm.request.headers.add({",
+          "        key: 'Authorization',",
+          "        value: 'Bearer ' + authToken",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GraphQL Health",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { health }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login - Owner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.login) {",
+                  "    pm.environment.set('authToken', response.data.login.token);",
+                  "    pm.environment.set('userId', response.data.login.user.id);",
+                  "    pm.environment.set('salonId', response.data.login.user.salonId);",
+                  "    console.log('Login successful, token saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation Login($email: String!, $password: String!) { login(email: $email, password: $password) { user { id email name role salonId salon { id name } } token } }\",\n  \"variables\": {\n    \"email\": \"owner@beautyparadise.com\",\n    \"password\": \"owner123\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Staff",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.login) {",
+                  "    pm.environment.set('authToken', response.data.login.token);",
+                  "    pm.environment.set('userId', response.data.login.user.id);",
+                  "    pm.environment.set('salonId', response.data.login.user.salonId);",
+                  "    console.log('Staff login successful, token saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation Login($email: String!, $password: String!) { login(email: $email, password: $password) { user { id email name role salonId salon { id name } } token } }\",\n  \"variables\": {\n    \"email\": \"staff@beautyparadise.com\",\n    \"password\": \"staff123\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Super Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.login) {",
+                  "    pm.environment.set('authToken', response.data.login.token);",
+                  "    pm.environment.set('userId', response.data.login.user.id);",
+                  "    console.log('Super Admin login successful, token saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation Login($email: String!, $password: String!) { login(email: $email, password: $password) { user { id email name role salonId salon { id name } } token } }\",\n  \"variables\": {\n    \"email\": \"superadmin@saloncrm.com\",\n    \"password\": \"admin123\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query Me { me { id email name role salonId salon { id name address phone } createdAt } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ChangePassword($currentPassword: String!, $newPassword: String!) { changePassword(currentPassword: $currentPassword, newPassword: $newPassword) { success message } }\",\n  \"variables\": {\n    \"currentPassword\": \"owner123\",\n    \"newPassword\": \"newpassword123\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Customer Management",
+      "item": [
+        {
+          "name": "Get All Customers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.customers && response.data.customers.length > 0) {",
+                  "    pm.environment.set('customerId', response.data.customers[0].id);",
+                  "    console.log('Customer ID saved:', response.data.customers[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetCustomers { customers { id name phone email address notes salon { name } appointments { id date service { name } } createdAt } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Customers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query SearchCustomers($search: String) { customers(search: $search) { id name phone email address } }\",\n  \"variables\": {\n    \"search\": \"Alice\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Customer by ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetCustomer($id: ID!) { customer(id: $id) { id name phone email address notes appointments { id date service { name price } staff { name } status } payments { id amount method status createdAt } } }\",\n  \"variables\": {\n    \"id\": \"{{customerId}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.createCustomer) {",
+                  "    pm.environment.set('customerId', response.data.createCustomer.id);",
+                  "    console.log('New customer created with ID:', response.data.createCustomer.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CreateCustomer($input: CreateCustomerInput!) { createCustomer(input: $input) { id name phone email address notes salon { name } createdAt } }\",\n  \"variables\": {\n    \"input\": {\n      \"name\": \"John Doe\",\n      \"phone\": \"+1234567890\",\n      \"email\": \"john.doe@example.com\",\n      \"address\": \"123 Main St, City, State 12345\",\n      \"notes\": \"New customer from Postman testing\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation UpdateCustomer($id: ID!, $input: UpdateCustomerInput!) { updateCustomer(id: $id, input: $input) { id name phone email address notes updatedAt } }\",\n  \"variables\": {\n    \"id\": \"{{customerId}}\",\n    \"input\": {\n      \"name\": \"John Doe Updated\",\n      \"email\": \"john.doe.updated@example.com\",\n      \"notes\": \"Updated customer information\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Customer Service History",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetCustomerServiceHistory($customerId: ID!) { customerServiceHistory(customerId: $customerId) { id date startTime endTime status service { name price duration } staff { name } payment { amount status } } }\",\n  \"variables\": {\n    \"customerId\": \"{{customerId}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Service Management",
+      "item": [
+        {
+          "name": "Get All Services",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.services && response.data.services.length > 0) {",
+                  "    pm.environment.set('serviceId', response.data.services[0].id);",
+                  "    console.log('Service ID saved:', response.data.services[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetServices { services { id name description duration price isActive salon { name } createdAt } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Service by ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetService($id: ID!) { service(id: $id) { id name description duration price isActive salon { name } appointments { id date customer { name } } } }\",\n  \"variables\": {\n    \"id\": \"{{serviceId}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Service",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CreateService($input: CreateServiceInput!) { createService(input: $input) { id name description duration price isActive salon { name } createdAt } }\",\n  \"variables\": {\n    \"input\": {\n      \"name\": \"Deep Conditioning Treatment\",\n      \"description\": \"Intensive hair conditioning and repair treatment\",\n      \"duration\": 75,\n      \"price\": 95.00\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Popular Services",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetPopularServices($limit: Int) { popularServices(limit: $limit) { id name price _count { appointments } } }\",\n  \"variables\": {\n    \"limit\": 5\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Appointment Management",
+      "item": [
+        {
+          "name": "Get All Appointments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.appointments && response.data.appointments.length > 0) {",
+                  "    pm.environment.set('appointmentId', response.data.appointments[0].id);",
+                  "    pm.environment.set('staffId', response.data.appointments[0].staffId);",
+                  "    console.log('Appointment ID saved:', response.data.appointments[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetAppointments { appointments { id customerId staffId serviceId date startTime endTime status notes customer { name phone } staff { name } service { name price duration } payment { id amount status } } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Appointments with Filters",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetAppointments($filters: AppointmentFilters) { appointments(filters: $filters) { id date startTime endTime status customer { name } staff { name } service { name } } }\",\n  \"variables\": {\n    \"filters\": {\n      \"status\": \"SCHEDULED\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check Staff Availability",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query CheckAvailability($staffId: ID!, $startTime: DateTime!, $endTime: DateTime!) { checkAvailability(staffId: $staffId, startTime: $startTime, endTime: $endTime) { available } }\",\n  \"variables\": {\n    \"staffId\": \"{{staffId}}\",\n    \"startTime\": \"2024-01-20T10:00:00Z\",\n    \"endTime\": \"2024-01-20T11:00:00Z\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Appointment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.createAppointment) {",
+                  "    pm.environment.set('appointmentId', response.data.createAppointment.id);",
+                  "    console.log('New appointment created with ID:', response.data.createAppointment.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CreateAppointment($input: CreateAppointmentInput!) { createAppointment(input: $input) { id customerId staffId serviceId date startTime endTime status notes customer { name } staff { name } service { name price } } }\",\n  \"variables\": {\n    \"input\": {\n      \"customerId\": \"{{customerId}}\",\n      \"staffId\": \"{{staffId}}\",\n      \"serviceId\": \"{{serviceId}}\",\n      \"date\": \"2024-01-20\",\n      \"startTime\": \"2024-01-20T14:00:00Z\",\n      \"endTime\": \"2024-01-20T15:00:00Z\",\n      \"notes\": \"Regular haircut appointment\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation UpdateAppointment($id: ID!, $input: UpdateAppointmentInput!) { updateAppointment(id: $id, input: $input) { id status notes updatedAt } }\",\n  \"variables\": {\n    \"id\": \"{{appointmentId}}\",\n    \"input\": {\n      \"status\": \"CONFIRMED\",\n      \"notes\": \"Appointment confirmed by customer\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CompleteAppointment($id: ID!) { completeAppointment(id: $id) { id status updatedAt } }\",\n  \"variables\": {\n    \"id\": \"{{appointmentId}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CancelAppointment($id: ID!) { cancelAppointment(id: $id) { id status updatedAt } }\",\n  \"variables\": {\n    \"id\": \"{{appointmentId}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment Management",
+      "item": [
+        {
+          "name": "Get All Payments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.payments && response.data.payments.length > 0) {",
+                  "    pm.environment.set('paymentId', response.data.payments[0].id);",
+                  "    console.log('Payment ID saved:', response.data.payments[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetPayments { payments { id appointmentId customerId amount method status transactionId notes customer { name } staff { name } appointment { service { name } } createdAt } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Payment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.createPayment) {",
+                  "    pm.environment.set('paymentId', response.data.createPayment.id);",
+                  "    console.log('New payment created with ID:', response.data.createPayment.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CreatePayment($input: CreatePaymentInput!) { createPayment(input: $input) { id appointmentId customerId amount method status transactionId notes customer { name } staff { name } createdAt } }\",\n  \"variables\": {\n    \"input\": {\n      \"appointmentId\": \"{{appointmentId}}\",\n      \"customerId\": \"{{customerId}}\",\n      \"amount\": 50.00,\n      \"method\": \"CASH\",\n      \"notes\": \"Payment for haircut service\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation GenerateInvoice($appointmentId: ID!) { generateInvoice(appointmentId: $appointmentId) { id amount method status appointment { service { name price } } customer { name } } }\",\n  \"variables\": {\n    \"appointmentId\": \"{{appointmentId}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Total Earnings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetTotalEarnings($startDate: Date!, $endDate: Date!) { totalEarnings(startDate: $startDate, endDate: $endDate) { totalEarnings } }\",\n  \"variables\": {\n    \"startDate\": \"2024-01-01\",\n    \"endDate\": \"2024-01-31\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Staff Earnings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetStaffEarnings($staffId: ID!, $startDate: Date!, $endDate: Date!) { staffEarnings(staffId: $staffId, startDate: $startDate, endDate: $endDate) { staffEarnings } }\",\n  \"variables\": {\n    \"staffId\": \"{{staffId}}\",\n    \"startDate\": \"2024-01-01\",\n    \"endDate\": \"2024-01-31\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetUsers { users { id email name role isActive salonId salon { name } createdAt } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Users by Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetUsersByRole($role: UserRole) { users(role: $role) { id email name role isActive salon { name } } }\",\n  \"variables\": {\n    \"role\": \"STAFF\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CreateUser($input: CreateUserInput!) { createUser(input: $input) { id email name role isActive salon { name } createdAt } }\",\n  \"variables\": {\n    \"input\": {\n      \"email\": \"newstaff@beautyparadise.com\",\n      \"password\": \"password123\",\n      \"name\": \"New Staff Member\",\n      \"role\": \"STAFF\",\n      \"phone\": \"+1987654321\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Promotions Management",
+      "item": [
+        {
+          "name": "Get All Promotions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.promotions && response.data.promotions.length > 0) {",
+                  "    pm.environment.set('promotionId', response.data.promotions[0].id);",
+                  "    console.log('Promotion ID saved:', response.data.promotions[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetPromotions { promotions { id title message status targetAll sendSMS sendEmail scheduledAt sentAt creator { name } salon { name } createdAt } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Promotion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.createPromotion) {",
+                  "    pm.environment.set('promotionId', response.data.createPromotion.id);",
+                  "    console.log('New promotion created with ID:', response.data.createPromotion.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation CreatePromotion($input: CreatePromotionInput!) { createPromotion(input: $input) { id title message status targetAll sendSMS sendEmail scheduledAt creator { name } createdAt } }\",\n  \"variables\": {\n    \"input\": {\n      \"title\": \"New Year Special Offer\",\n      \"message\": \"Get 20% off on all hair services this January! Book your appointment now.\",\n      \"targetAll\": true,\n      \"sendSMS\": true,\n      \"sendEmail\": true\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activate Promotion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ActivatePromotion($id: ID!) { activatePromotion(id: $id) { id status scheduledAt updatedAt } }\",\n  \"variables\": {\n    \"id\": \"{{promotionId}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send Promotion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation SendPromotion($id: ID!) { sendPromotion(id: $id) { totalCustomers smsCount emailCount sentAt } }\",\n  \"variables\": {\n    \"id\": \"{{promotionId}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Promotion Stats",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetPromotionStats { promotionStats { total draft active sent paused } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports & Analytics",
+      "item": [
+        {
+          "name": "Dashboard Stats",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query DashboardStats { dashboardStats { today { appointments earnings } monthly { earnings } totals { customers staff } } }\"\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Job Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query JobReport($startDate: Date!, $endDate: Date!, $staffId: ID) { jobReport(startDate: $startDate, endDate: $endDate, staffId: $staffId) { period { startDate endDate } statistics { totalJobs completedJobs pendingJobs cancelledJobs completionRate } cancellationReasons { customerRequest staffUnavailable noShow other } } }\",\n  \"variables\": {\n    \"startDate\": \"2024-01-01\",\n    \"endDate\": \"2024-01-31\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Financial Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query FinancialReport($startDate: Date!, $endDate: Date!) { financialReport(startDate: $startDate, endDate: $endDate) { period { startDate endDate } summary { totalEarnings totalTransactions averageTransaction } paymentMethods { cash card digitalWallet bankTransfer } serviceEarnings dailyEarnings } }\",\n  \"variables\": {\n    \"startDate\": \"2024-01-01\",\n    \"endDate\": \"2024-01-31\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Staff Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query StaffReport($startDate: Date!, $endDate: Date!) { staffReport(startDate: $startDate, endDate: $endDate) { period { startDate endDate } staffPerformance { name servicesCompleted totalEarnings customersServed completionRate averageEarningsPerService appointments { total completed cancelled noShow } } summary { totalStaff totalServicesCompleted totalEarnings totalCustomersServed } } }\",\n  \"variables\": {\n    \"startDate\": \"2024-01-01\",\n    \"endDate\": \"2024-01-31\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{graphqlEndpoint}}",
+              "host": ["{{graphqlEndpoint}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

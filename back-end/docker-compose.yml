@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:123456@db:5432/salon_crm_db
+      - JWT_SECRET=47140bb5e1db19d5b897393c3eb2c6b4cb71d9c3d16e1068ac7fb2ed15c15224abda094e32f404e424fa3f74258c0268c628e5556d76887c424f667b1fb2a99c
+      - API_KEY=28ab33dfada40df65d20a8999fca7e1b1b2f474f078b4886bcbec8ccd0524017
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npx nodemon src/index.js
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=salon_crm_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
