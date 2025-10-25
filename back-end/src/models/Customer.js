@@ -71,8 +71,8 @@ class Customer {
   }
 
   static async findBySalon(salonId, searchTerm = null) {
-    const where = { salonId };
-    
+  const where = { salonId };
+  
     if (searchTerm) {
       where.OR = [
         { name: { contains: searchTerm, mode: 'insensitive' } },
@@ -84,13 +84,15 @@ class Customer {
     return await prisma.customer.findMany({
       where,
       include: {
-        salon: true
+        salon: true,
+        appointments: true
       },
       orderBy: {
         createdAt: 'desc'
       }
     });
   }
+
 
   static async getServiceHistory(customerId) {
     return await prisma.appointment.findMany({
