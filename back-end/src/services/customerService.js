@@ -26,7 +26,7 @@ class CustomerService {
 
       value.salonId = salonId;
       const customer = await Customer.create(value);
-      
+
       return customer;
     } catch (error) {
       throw new Error(`Customer creation failed: ${error.message}`);
@@ -36,7 +36,7 @@ class CustomerService {
   static async updateCustomer(customerId, customerData, userSalonId) {
     try {
       const existingCustomer = await Customer.findById(customerId);
-      
+
       if (!existingCustomer) {
         throw new Error('Customer not found');
       }
@@ -61,7 +61,7 @@ class CustomerService {
       }
 
       const customer = await Customer.update(customerId, value);
-      
+
       return customer;
     } catch (error) {
       throw new Error(`Customer update failed: ${error.message}`);
@@ -71,7 +71,7 @@ class CustomerService {
   static async deleteCustomer(customerId, userSalonId) {
     try {
       const existingCustomer = await Customer.findById(customerId);
-      
+
       if (!existingCustomer) {
         throw new Error('Customer not found');
       }
@@ -82,7 +82,7 @@ class CustomerService {
       }
 
       await Customer.delete(customerId);
-      
+
       return { success: true };
     } catch (error) {
       throw new Error(`Customer deletion failed: ${error.message}`);
@@ -101,7 +101,7 @@ class CustomerService {
   static async getCustomerById(customerId, userSalonId) {
     try {
       const customer = await Customer.findById(customerId);
-      
+
       if (!customer) {
         throw new Error('Customer not found');
       }
@@ -133,7 +133,7 @@ class CustomerService {
   static async getCustomerServiceHistory(customerId, userSalonId) {
     try {
       const customer = await Customer.findById(customerId);
-      
+
       if (!customer) {
         throw new Error('Customer not found');
       }
