@@ -1,12 +1,12 @@
 // front-end/src/app/page.tsx
 'use client';
 
+import { SidebarInset} from "@/components/ui/sidebar";
+
 export default function Home() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-xl">
-        Customers
-      </div>
-    </div>
+    <SidebarInset>
+      <h1>Customers</h1>
+    </SidebarInset>
   );
 }
